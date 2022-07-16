@@ -21,7 +21,7 @@ type Board struct {
 
 func (b *Board) CellAt(x int, y int) *Cell {
 	index := x + (b.width)*y
-	if x < 0 || y < 0 {
+	if x < 0 || y < 0 || x >= b.width || y >= b.height {
 		return nil
 	}
 	if index >= len(b.grid) || index < 0 {
