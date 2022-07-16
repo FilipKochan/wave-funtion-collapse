@@ -29,7 +29,7 @@ func (g *Game) Update() error {
 		return nil
 	}
 
-	fmt.Println("updated")
+	// fmt.Println("updated")
 
 	nextCell.Collapse()
 
@@ -108,8 +108,6 @@ func NewGame(size int) *Game {
 		}
 
 	}
-
-	fmt.Printf("%v\n", tiles)
 
 	grid := make([]*Cell, size*size)
 	for i := 0; i < size*size; i++ {

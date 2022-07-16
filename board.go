@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 )
@@ -39,7 +38,7 @@ func (b *Board) UpdateEntropies() {
 			b.calculatePossibleTilesAt(i, j)
 		}
 	}
-	fmt.Println("=== UPDATING DONE ===")
+	// fmt.Println("=== UPDATING DONE ===")
 }
 
 func (b *Board) IsFull() bool {
@@ -76,37 +75,37 @@ func (b *Board) calculatePossibleTilesAt(cx int, cy int) {
 			continue
 		}
 
-		fmt.Printf("Cell [%v, %v] has collapsed neighbor at [%v, %v]\n", cx, cy, newX, newY)
+		// fmt.Printf("Cell [%v, %v] has collapsed neighbor at [%v, %v]\n", cx, cy, newX, newY)
 		neighborsCount++
 
 		placedTile := neighbor.tile
 		newPossibleTiles := []int{}
 		for i, thisTile := range curr.possibleTiles {
-			fmt.Printf("at [%v, %v]: checking whether tile (%v) %v is possible\n", cx, cy, i, thisTile)
+			// fmt.Printf("at [%v, %v]: checking whether tile (%v) %v is possible\n", cx, cy, i, thisTile)
 			switch dir {
 			case up:
 				if thisTile.sides.top.ConnectsTo(&placedTile.sides.bottom) {
 					newPossibleTiles = append(newPossibleTiles, i)
-					fmt.Printf("Tile (%v) connects to placed tile %v from UP\n", i, *placedTile)
+					// fmt.Printf("Tile (%v) connects to placed tile %v from UP\n", i, *placedTile)
 				}
 			case right:
 				if thisTile.sides.right.ConnectsTo(&placedTile.sides.left) {
 					newPossibleTiles = append(newPossibleTiles, i)
-					fmt.Printf("Tile (%v) connects to placed tile %v from RIGHT\n", i, *placedTile)
+					// fmt.Printf("Tile (%v) connects to placed tile %v from RIGHT\n", i, *placedTile)
 				}
 			case down:
 				if thisTile.sides.bottom.ConnectsTo(&placedTile.sides.top) {
 					newPossibleTiles = append(newPossibleTiles, i)
-					fmt.Printf("Tile (%v) connects to placed tile %v from DOWN\n", i, *placedTile)
+					// fmt.Printf("Tile (%v) connects to placed tile %v from DOWN\n", i, *placedTile)
 				}
 			case left:
 				if thisTile.sides.left.ConnectsTo(&placedTile.sides.right) {
 					newPossibleTiles = append(newPossibleTiles, i)
-					fmt.Printf("Tile (%v) connects to placed tile %v from LEFT\n", i, *placedTile)
+					// fmt.Printf("Tile (%v) connects to placed tile %v from LEFT\n", i, *placedTile)
 				}
 			}
 		}
-		fmt.Printf("new possible options: %v\n", newPossibleTiles)
+		// fmt.Printf("new possible options: %v\n", newPossibleTiles)
 
 		for _, v := range newPossibleTiles {
 			overallPossible[v]++
@@ -114,12 +113,12 @@ func (b *Board) calculatePossibleTilesAt(cx int, cy int) {
 	}
 
 	if neighborsCount == 0 {
-		fmt.Printf("at [%v, %v] has no collapsed neighbors, returning...\n", cx, cy)
+		// fmt.Printf("at [%v, %v] has no collapsed neighbors, returning...\n", cx, cy)
 		return
 	}
 
-	fmt.Printf("overall possible options: %v\n", overallPossible)
-	fmt.Printf("neighbors: %v\n", neighborsCount)
+	// fmt.Printf("overall possible options: %v\n", overallPossible)
+	// fmt.Printf("neighbors: %v\n", neighborsCount)
 	result := []*Tile{}
 	for k, v := range overallPossible {
 		if v == neighborsCount {
@@ -127,7 +126,7 @@ func (b *Board) calculatePossibleTilesAt(cx int, cy int) {
 		}
 	}
 	curr.possibleTiles = result
-	fmt.Printf("new possible tiles at [%v, %v]: %v\n\n", cx, cy, curr.possibleTiles)
+	// fmt.Printf("new possible tiles at [%v, %v]: %v\n\n", cx, cy, curr.possibleTiles)
 }
 
 func (b *Board) GetCellWithLeastEntropy() *Cell {

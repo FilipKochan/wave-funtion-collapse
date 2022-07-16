@@ -45,6 +45,6 @@ const (
 
 func (s *Side) ConnectsTo(other *Side) bool {
 	res := s.right == other.left && s.middle == other.middle && s.left == other.right
-	fmt.Printf("checking connectivity between cells: %v and %v | connects: %v\n", *s, *other, res)
+	// fmt.Printf("checking connectivity between cells: %v and %v | connects: %v\n", *s, *other, res)
 	return res
 }
