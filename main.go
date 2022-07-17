@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	game := NewGame(32)
+	game := NewGame()
 	ebiten.SetWindowSize(800, 800)
 	ebiten.SetWindowTitle("Wave Function Collapse")
 	if err := ebiten.RunGame(game); err != nil {

@@ -1,14 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	_ "image/png"
-	"log"
 	"math"
 	"math/rand"
+	"os"
+	"strings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Game struct {
@@ -76,34 +78,28 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 	return 800, 800
 }
 
-func NewGame(size int) *Game {
-	var tiles []*Tile
-	for i, path := range []string{"tiles/pipe/blank.png", "tiles/pipe/down.png"} {
-		eImage, _, err := ebitenutil.NewImageFromFile(path)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+func NewGame() *Game {
 
-		t := &Tile{image: *eImage}
-		tiles = append(tiles, t)
-		if i == 0 {
-			t.sides = Sides{
-				top:    Side{SideEmpty, SideEmpty, SideEmpty},
-				right:  Side{SideEmpty, SideEmpty, SideEmpty},
-				bottom: Side{SideEmpty, SideEmpty, SideEmpty},
-				left:   Side{SideEmpty, SideEmpty, SideEmpty},
-			}
-		}
-		if i == 1 {
-			t.sides = Sides{
-				top:    Side{SideEmpty, SideEmpty, SideEmpty},
-				right:  Side{SideEmpty, SidePipe, SideEmpty},
-				bottom: Side{SideEmpty, SidePipe, SideEmpty},
-				left:   Side{SideEmpty, SidePipe, SideEmpty},
-			}
-			tiles = append(tiles, t.Rotated(1), t.Rotated(2), t.Rotated(3))
-		}
+	var seed int64
+	var size int
+	var tileset string
+	tilesets := ParseTilesetsFromJSON()
+	flag.Int64Var(&seed, "seed", time.Now().UTC().Unix(), "random seed for the generation, default is time.Now().UTC().Unix()")
+	flag.IntVar(&size, "size", 32, "size of the board")
+	flag.StringVar(&tileset, "tileset", tilesets[0].TilesetName, fmt.Sprintf("specifies the set of tiles used to generate the image, possible values: [%v]", strings.Join(GetTilesetsNames(tilesets), ", ")))
+	flag.Parse()
+
+	if !IsTilesetValid(tileset, tilesets) {
+		fmt.Fprintln(os.Stderr, "invalid tileset option")
+		flag.PrintDefaults()
+		os.Exit(1)
 	}
+
+	rg := rand.New(rand.NewSource(seed))
+
+	fmt.Printf("     === using ===\nrandom seed:\t%v\nboard size:\t%v\ntileset:\t%v\n", seed, size, tileset)
+
+	tiles := CreateTileset(tileset, tilesets)
 
 	grid := make([]*Cell, size*size)
 	for i := 0; i < size*size; i++ {
@@ -111,8 +107,6 @@ func NewGame(size int) *Game {
 	}
 
 	board := &Board{grid: grid, width: size, height: size}
-
-	rg := rand.New(rand.NewSource(69420))
 
 	game := &Game{tiles: tiles, board: board, size: size, randGenerator: rg}
 

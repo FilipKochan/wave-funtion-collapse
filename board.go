@@ -45,7 +45,8 @@ func (b *Board) UpdateEntropies() {
 func (b *Board) IsFull() bool {
 	for i := 0; i < b.width; i++ {
 		for j := 0; j < b.height; j++ {
-			if !b.CellAt(i, j).collapsed {
+			c := b.CellAt(i, j)
+			if !c.collapsed && c.GetEntropy() > 0 {
 				return false
 			}
 		}
@@ -84,22 +85,22 @@ func (b *Board) calculatePossibleTilesAt(cx int, cy int) {
 			// fmt.Printf("at [%v, %v]: checking whether tile (%v) %v is possible\n", cx, cy, i, thisTile)
 			switch dir {
 			case up:
-				if thisTile.sides.top.ConnectsTo(&placedTile.sides.bottom) {
+				if thisTile.sides.Top.ConnectsTo(&placedTile.sides.Bottom) {
 					newPossibleTiles = append(newPossibleTiles, i)
 					// fmt.Printf("Tile (%v) connects to placed tile %v from UP\n", i, *placedTile)
 				}
 			case right:
-				if thisTile.sides.right.ConnectsTo(&placedTile.sides.left) {
+				if thisTile.sides.Right.ConnectsTo(&placedTile.sides.Left) {
 					newPossibleTiles = append(newPossibleTiles, i)
 					// fmt.Printf("Tile (%v) connects to placed tile %v from RIGHT\n", i, *placedTile)
 				}
 			case down:
-				if thisTile.sides.bottom.ConnectsTo(&placedTile.sides.top) {
+				if thisTile.sides.Bottom.ConnectsTo(&placedTile.sides.Top) {
 					newPossibleTiles = append(newPossibleTiles, i)
 					// fmt.Printf("Tile (%v) connects to placed tile %v from DOWN\n", i, *placedTile)
 				}
 			case left:
-				if thisTile.sides.left.ConnectsTo(&placedTile.sides.right) {
+				if thisTile.sides.Left.ConnectsTo(&placedTile.sides.Right) {
 					newPossibleTiles = append(newPossibleTiles, i)
 					// fmt.Printf("Tile (%v) connects to placed tile %v from LEFT\n", i, *placedTile)
 				}
@@ -148,7 +149,7 @@ func (b *Board) GetCellWithLeastEntropy(randGenerator *rand.Rand) *Cell {
 				continue
 			}
 			e := c.GetEntropy()
-			if e < leastEntropy {
+			if e < leastEntropy && e > 0 {
 				leastEntropy = e
 			}
 		}
