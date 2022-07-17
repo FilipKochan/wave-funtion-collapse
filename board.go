@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 	"math/rand"
+	"sort"
 )
 
 const (
@@ -75,7 +76,6 @@ func (b *Board) calculatePossibleTilesAt(cx int, cy int) {
 			continue
 		}
 
-		// fmt.Printf("Cell [%v, %v] has collapsed neighbor at [%v, %v]\n", cx, cy, newX, newY)
 		neighborsCount++
 
 		placedTile := neighbor.tile
@@ -117,20 +117,28 @@ func (b *Board) calculatePossibleTilesAt(cx int, cy int) {
 		return
 	}
 
-	// fmt.Printf("overall possible options: %v\n", overallPossible)
-	// fmt.Printf("neighbors: %v\n", neighborsCount)
 	result := []*Tile{}
+	overallPossibleList := []int{}
+
 	for k, v := range overallPossible {
 		if v == neighborsCount {
-			result = append(result, curr.possibleTiles[k])
+			overallPossibleList = append(overallPossibleList, k)
 		}
 	}
+
+	sort.Slice(overallPossibleList, func(i, j int) bool {
+		return overallPossibleList[i] < overallPossibleList[j]
+	})
+
+	for _, v := range overallPossibleList {
+		result = append(result, curr.possibleTiles[v])
+	}
+
 	curr.possibleTiles = result
-	// fmt.Printf("new possible tiles at [%v, %v]: %v\n\n", cx, cy, curr.possibleTiles)
 }
 
-func (b *Board) GetCellWithLeastEntropy() *Cell {
-	selected := make([]*Cell, 0)
+func (b *Board) GetCellWithLeastEntropy(randGenerator *rand.Rand) *Cell {
+	selected := []*Cell{}
 	leastEntropy := math.MaxInt
 
 	for i := 0; i < b.width; i++ {
@@ -139,8 +147,9 @@ func (b *Board) GetCellWithLeastEntropy() *Cell {
 			if c.collapsed {
 				continue
 			}
-			if c.GetEntropy() < leastEntropy {
-				leastEntropy = c.GetEntropy()
+			e := c.GetEntropy()
+			if e < leastEntropy {
+				leastEntropy = e
 			}
 		}
 	}
@@ -158,14 +167,11 @@ func (b *Board) GetCellWithLeastEntropy() *Cell {
 		}
 	}
 
-	// fmt.Println("getting cell with least entropy")
-	// fmt.Printf("possible options: %v\n", selected)
-
 	if len(selected) == 0 {
 		return nil
 	}
 
-	i := rand.Intn(len(selected))
-
-	return selected[i]
+	i := randGenerator.Intn(len(selected))
+	result := selected[i]
+	return result
 }

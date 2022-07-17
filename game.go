@@ -5,33 +5,31 @@ import (
 	_ "image/png"
 	"log"
 	"math"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Game struct {
-	tiles []*Tile
-	board *Board
-	size  int
+	tiles         []*Tile
+	board         *Board
+	size          int
+	randGenerator *rand.Rand
 }
 
 func (g *Game) Update() error {
 	if g.board.IsFull() {
-		fmt.Println("board is full...")
 		return nil
 	}
 
-	nextCell := g.board.GetCellWithLeastEntropy()
-	// time.Sleep(1 * time.Second)
+	nextCell := g.board.GetCellWithLeastEntropy(g.randGenerator)
 	if nextCell == nil {
 		fmt.Println("out of options, can't continue")
 		return nil
 	}
 
-	// fmt.Println("updated")
-
-	nextCell.Collapse()
+	nextCell.Collapse(g.randGenerator)
 
 	g.board.UpdateEntropies()
 
@@ -69,7 +67,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			geom.Rotate(float64(rot) * math.Pi / 2)
 			geom.Translate(float64(wantedImageWidth*i)+float64(xShift)*float64(wantedImageWidth), float64(wantedImageWidth*j)+float64(yShift)*float64(wantedImageWidth))
 			screen.DrawImage(image, &ebiten.DrawImageOptions{GeoM: geom})
-			// ebitenutil.DebugPrintAt(screen, fmt.Sprintf("[%v,%v]\n%v", i, j, cell.GetEntropy()), wantedImageWidth*i+wantedImageWidth/2, wantedImageWidth*j+wantedImageWidth/2)
 		}
 	}
 
@@ -106,7 +103,6 @@ func NewGame(size int) *Game {
 			}
 			tiles = append(tiles, t.Rotated(1), t.Rotated(2), t.Rotated(3))
 		}
-
 	}
 
 	grid := make([]*Cell, size*size)
@@ -116,7 +112,9 @@ func NewGame(size int) *Game {
 
 	board := &Board{grid: grid, width: size, height: size}
 
-	game := &Game{tiles: tiles, board: board, size: size}
+	rg := rand.New(rand.NewSource(69420))
+
+	game := &Game{tiles: tiles, board: board, size: size, randGenerator: rg}
 
 	return game
 }

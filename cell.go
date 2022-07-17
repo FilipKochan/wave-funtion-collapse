@@ -15,7 +15,7 @@ func (c *Cell) GetEntropy() int {
 	return len(c.possibleTiles)
 }
 
-func (c *Cell) Collapse() {
+func (c *Cell) Collapse(randGenerator *rand.Rand) {
 	if c.collapsed {
 		panic("cell is already collapsed")
 	}
@@ -24,7 +24,9 @@ func (c *Cell) Collapse() {
 		panic("cell cannot be collapsed, has no options")
 	}
 
-	c.tile = c.possibleTiles[rand.Intn(len(c.possibleTiles))]
+	i := randGenerator.Intn(len(c.possibleTiles))
+	resultTile := c.possibleTiles[i]
+	c.tile = resultTile
 	c.collapsed = true
 }
 

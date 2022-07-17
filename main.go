@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	// rand.Seed(42)
 	game := NewGame(32)
 	ebiten.SetWindowSize(800, 800)
 	ebiten.SetWindowTitle("Wave Function Collapse")

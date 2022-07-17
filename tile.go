@@ -22,7 +22,7 @@ func (t *Tile) Rotated(times int) *Tile {
 }
 
 func (t *Tile) String() string {
-	return fmt.Sprintf("Tile{ rotation: %v, sides: %v, image: %v }", t.rotation, t.sides, t.image)
+	return fmt.Sprintf("Tile{ rotation: %v, sides: %v }", t.rotation, t.sides)
 }
 
 type Sides struct {
@@ -45,6 +45,5 @@ const (
 
 func (s *Side) ConnectsTo(other *Side) bool {
 	res := s.right == other.left && s.middle == other.middle && s.left == other.right
-	// fmt.Printf("checking connectivity between cells: %v and %v | connects: %v\n", *s, *other, res)
 	return res
 }
